@@ -301,7 +301,8 @@ export default function MarketplaceStorefront() {
                 Discover more. Shop independent.
               </Typography>
               <Typography sx={{ maxWidth: 500, color: "#010c13", fontFamily: "var(--font-inter), Arial, sans-serif", fontSize: { xs: 18, md: 19 }, fontWeight: 900, lineHeight: 1.65, letterSpacing: "0.005em", textShadow: "0 1px 1px rgba(255,255,255,0.35)" }}>
-                Explore products from independent shops, compare your options, and place your order in one convenient marketplace. The best place to shop. 
+                Explore products from independent shops, compare your options, and place your order in one convenient marketplace. 
+                The best place to shop. 
               </Typography>
               <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mt: 4 }}>
                 <Button
