@@ -8,6 +8,7 @@ import {
   CardContent,
   Container,
   Grid,
+  MenuItem,
   Stack,
   TextField,
   Typography,
@@ -15,6 +16,7 @@ import {
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import MainLayouts from "../../../../layouts/MainLayouts";
+import { MARKETPLACE_CATEGORIES } from "@/lib/marketplace-categories";
 import {
   getProductImageValidationError,
   addProductToVendor,
@@ -33,6 +35,10 @@ export default function VendorDashboardPage() {
   const [vendor, setVendor] = useState<MarketVendor | null>(null);
   const [products, setProducts] = useState<MarketProduct[]>([]);
   const [activities, setActivities] = useState<MarketActivity[]>([]);
+  const categoryOptions = Array.from(new Set([
+    ...MARKETPLACE_CATEGORIES,
+    ...products.map((product) => product.category).filter(Boolean),
+  ]));
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -190,7 +196,20 @@ export default function VendorDashboardPage() {
                   {vendor.status === "approved" ? <form onSubmit={handleSubmit}>
                     <Stack spacing={2}>
                       <TextField required label="Product name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} fullWidth />
-                      <TextField required label="Category" value={form.category} onChange={(event) => setForm({ ...form, category: event.target.value })} fullWidth />
+                      <TextField
+                        select
+                        required
+                        label="Category"
+                        value={form.category}
+                        onChange={(event) => setForm({ ...form, category: event.target.value })}
+                        helperText="Choose the category that best describes your product."
+                        fullWidth
+                      >
+                        <MenuItem value="" disabled>Select a category</MenuItem>
+                        {categoryOptions.map((category) => (
+                          <MenuItem key={category} value={category}>{category}</MenuItem>
+                        ))}
+                      </TextField>
                       <TextField required label="Description" multiline minRows={3} value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} fullWidth />
                       <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                         <TextField required label="Price" type="number" inputProps={{ min: 0, step: "0.01" }} value={form.price} onChange={(event) => setForm({ ...form, price: event.target.value })} fullWidth />

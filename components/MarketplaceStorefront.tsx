@@ -2,15 +2,21 @@
 
 import AddIcon from "@mui/icons-material/Add";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
+import CheckroomOutlinedIcon from "@mui/icons-material/CheckroomOutlined";
+import ChairOutlinedIcon from "@mui/icons-material/ChairOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import DevicesOtherOutlinedIcon from "@mui/icons-material/DevicesOtherOutlined";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import LocalGroceryStoreOutlinedIcon from "@mui/icons-material/LocalGroceryStoreOutlined";
+import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import RemoveIcon from "@mui/icons-material/Remove";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
-import StarRoundedIcon from "@mui/icons-material/StarRounded";
+import SportsBasketballOutlinedIcon from "@mui/icons-material/SportsBasketballOutlined";
 import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
 import {
@@ -33,6 +39,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import MainLayouts from "../layouts/MainLayouts";
+import { MARKETPLACE_CATEGORIES } from "@/lib/marketplace-categories";
 import { getAllProducts, MarketProduct } from "../src/lib/supabase-marketplace";
 import ValueProposition from "./ValueProposition";
 
@@ -46,24 +53,35 @@ const currency = new Intl.NumberFormat("en-NG", {
   currency: "NGN",
 });
 
-const DEFAULT_CATEGORIES = [
-  "Accessories",
-  "Women's Clothing",
-  "Men's Clothing",
-  "Appliances",
-  "Beauty and Health",
-  "Electronics",
-  "Furniture",
-  "Sports",
-  "Books",
-  "Groceries",
-];
 const SLIDER_IMAGES = [
   "/img/product-1.jpg", // Replace with your exact filename
   "/img/product-2.jpg",                    // Replace with your exact filename
   "/img/product-3.jpg",
   "/img/product-4.jpg",                       // Replace with your exact filename
 ];
+const CATEGORY_IMAGES: Record<string, string> = {
+  Accessories: "/Categories/Accessories.jpg",
+  "Women's Clothing": "/Categories/women clothing.jpg",
+  "Men's Clothing": "/Categories/men clothing.jpg",
+  Appliances: "/Categories/appliance.jpg",
+  "Beauty and Health": "/Categories/beauty and health.jpg",
+  Electronics: "/Categories/electronics.jpg",
+  Furniture: "/Categories/furniture.jpg",
+  Sports: "/Categories/sport.jpg",
+  Books: "/Categories/book.jpg",
+  Groceries: "/Categories/groceries.jpg",
+};
+
+function getCategoryIcon(categoryName: string) {
+  const name = categoryName.toLowerCase();
+  if (name.includes("cloth") || name.includes("fashion") || name.includes("wear")) return <CheckroomOutlinedIcon />;
+  if (name.includes("furniture") || name.includes("home")) return <ChairOutlinedIcon />;
+  if (name.includes("grocery") || name.includes("food")) return <LocalGroceryStoreOutlinedIcon />;
+  if (name.includes("book")) return <MenuBookOutlinedIcon />;
+  if (name.includes("sport")) return <SportsBasketballOutlinedIcon />;
+  if (name.includes("electronic") || name.includes("appliance") || name.includes("accessor")) return <DevicesOtherOutlinedIcon />;
+  return <CategoryOutlinedIcon />;
+}
 
 export default function MarketplaceStorefront() {
   const pathname = usePathname();
@@ -157,15 +175,19 @@ export default function MarketplaceStorefront() {
   );
   const categories = [
     "All products",
-    ...DEFAULT_CATEGORIES,
+    ...MARKETPLACE_CATEGORIES,
     ...discoveredCategories.filter(
-      (item) => !DEFAULT_CATEGORIES.includes(item)
+      (item) => !MARKETPLACE_CATEGORIES.includes(item as (typeof MARKETPLACE_CATEGORIES)[number])
     ),
   ];
   const normalizedSearch = search.trim().toLowerCase();
   const approvedProducts = products.filter(
     (product) => product.vendorStatus === "approved"
   );
+  const approvedCategories = Array.from(
+    new Set(approvedProducts.map((product) => product.category).filter(Boolean))
+  );
+  const homepageCategories = (approvedCategories.length > 0 ? approvedCategories : [...MARKETPLACE_CATEGORIES]).slice(0, 10);
   const visibleProducts = approvedProducts
     .filter((product) => category === "All products" || product.category === category)
     .filter((product) =>
@@ -179,7 +201,6 @@ export default function MarketplaceStorefront() {
       if (sort === "price-high") return second.price - first.price;
       return second.createdAt.localeCompare(first.createdAt);
     });
-  const displayedProducts = isFullCatalog ? visibleProducts : visibleProducts.slice(0, 10);
   const productGroups = isFullCatalog
     ? [
         ...categories.slice(1).map((groupName) => ({
@@ -190,7 +211,12 @@ export default function MarketplaceStorefront() {
           ? [{ name: "Other products", products: visibleProducts.filter((product) => !product.category) }]
           : []),
       ]
-    : [{ name: "", products: displayedProducts }];
+    : [
+        { name: "Featured finds", products: visibleProducts.slice(0, 5) },
+        ...(visibleProducts.length > 5
+          ? [{ name: "More to explore", products: visibleProducts.slice(5, 10) }]
+          : []),
+      ];
   const cartCount = cart.reduce((total, line) => total + line.quantity, 0);
   const cartTotal = cart.reduce(
     (total, line) => total + line.product.price * line.quantity,
@@ -263,206 +289,200 @@ export default function MarketplaceStorefront() {
         ))}
       </div>
       <Box sx={{ minHeight: "100vh", background: "#f7f8f5", color: "#202823" }}>
-        {!isFullCatalog ? <Box
-          component="section"
-          sx={{
-            minHeight: { xs: "calc(100svh - 64px)", md: "calc(100svh - 76px)" },
-            display: "flex",
-            alignItems: "center",
-            backgroundColor: "#e8e7e2",
-            backgroundImage: {
-              xs: `linear-gradient(90deg, rgba(250,250,248,.84) 0%, rgba(250,250,248,.62) 62%, rgba(250,250,248,.3) 100%), url(${SLIDER_IMAGES[currentImgIdx]})`,
-              md: `linear-gradient(90deg, rgba(250,250,248,.9) 0%, rgba(250,250,248,.62) 42%, rgba(250,250,248,.08) 78%), url(${SLIDER_IMAGES[currentImgIdx]})`,
-            },
-
-            backgroundPosition: { xs: "68% center", md: "center" },
-            backgroundSize: "cover",
-             transition: "background-image 1s ease-in-out", // Smooth crossfade transition
-          }}
-        >
-          <Container maxWidth="xl" sx={{ py: { xs: 8, md: 12 } }}>
-            <Box sx={{ maxWidth: 640 }}>
-              <Typography variant="overline" sx={{ color: "#4e6059", fontWeight: 700, letterSpacing: 1.5 }}>
-                CLOUDFUND MARKETPLACE
-              </Typography>
-              <Typography
-                component="h1"
-                sx={{
-                  maxWidth: 620,
-                  mt: 1,
-                  mb: 2.5,
-                  color: "#28333b",
-                  fontSize: { xs: 44, sm: 60, md: 72 },
-                  lineHeight: 1.06,
-                  fontWeight: 500,
-                  letterSpacing: 0,
-                }}
-              >
-                Discover more. Shop independent.
-              </Typography>
-              <Typography sx={{ maxWidth: 500, color: "#010c13", fontFamily: "var(--font-inter), Arial, sans-serif", fontSize: { xs: 18, md: 19 }, fontWeight: 900, lineHeight: 1.65, letterSpacing: "0.005em", textShadow: "0 1px 1px rgba(255,255,255,0.35)" }}>
-                Explore products from independent shops, compare your options, and place your order in one convenient marketplace.
-              </Typography>
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mt: 4 }}>
-                <Button
-                  component={Link}
-                  href="#catalog"
-                  variant="contained"
-                  sx={{ px: 3.5, py: 1.4, borderRadius: 20, backgroundColor: "#00a57a", textTransform: "none", fontSize: 16, boxShadow: "none", "&:hover": { backgroundColor: "#008d68", boxShadow: "none" } }}
-                >
-                  Browse products
-                </Button>
-                <Button
-                  component={Link}
-                  href="/vendor/register"
-                  sx={{ px: 3.5, py: 1.4, borderRadius: 20, backgroundColor: "rgba(255,255,255,.76)", color: "#28333b", textTransform: "none", fontSize: 16, "&:hover": { backgroundColor: "#fff" } }}
-                >
-                  Sell on Cloudfund
-                </Button>
-              </Stack>
-            </Box>
-          </Container>
-        </Box> : null}
-
-          <Box sx={{ display: { xs: "block", md: "none" }, pb: 2.5 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, background: "#fff", border: "1px solid #dfe5df", borderRadius: 2, p: 1, boxShadow: "0 5px 18px rgba(32, 60, 53, 0.06)" }}>
-              <SearchRoundedIcon sx={{ color: "#7a867f", ml: 1 }} fontSize="small" />
-              <input
-                type="search"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search products and shops"
-                aria-label="Search products and shops"
-                style={{ flex: 1, minWidth: 0, border: 0, outline: 0, fontSize: 14, color: "#202823", background: "transparent" }}
-              />
-              <Button onClick={() => setCartOpen(true)} aria-label={`Open shopping bag with ${cartCount} items`} sx={{ minWidth: 44, width: 44, height: 44, borderRadius: 1.5, background: "#203c35", color: "#fff", p: 0, "&:hover": { background: "#172e28" } }}>
-                <ShoppingBagOutlinedIcon fontSize="small" />
-              </Button>
-            </Box>
-            <FormControl fullWidth sx={{ mt: 1.5 }}>
-              <Select
-                value={category}
-                onChange={(event) => {
-                  setCategory(event.target.value);
-                  document.getElementById("catalog")?.scrollIntoView({ behavior: "smooth" });
-                }}
-                aria-label="Filter products by category"
-                sx={{ backgroundColor: "#fff", borderRadius: 2, border: "1px solid #dfe5df", "& .MuiSelect-select": { py: 1.25, fontSize: 13 } }}
-              >
-                <MenuItem value="All products">All categories</MenuItem>
-                {categories.filter((item) => item !== "All products").map((item) => (
-                  <MenuItem key={item} value={item}>{item}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-
+        {!isFullCatalog ? (
           <Box
+            component="section"
+            aria-label="Cloudfund marketplace promotion"
             sx={{
-              display: { xs: "grid", md: "grid" },
-              gridTemplateColumns: { xs: "1fr", md: "0.75fr 1.25fr" },
-              gap: { xs: 2, md: 3 },
-              mb: 2.5,
-              py: 1,
+              position: "relative",
+              overflow: "hidden",
+              isolation: "isolate",
+              color: "#fff",
+              background: "#07506a",
             }}
           >
             <Box
+              key={SLIDER_IMAGES[currentImgIdx]}
+              component="img"
+              src={SLIDER_IMAGES[currentImgIdx]}
+              alt="A featured product available from a Cloudfund shop"
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                minHeight: { xs: 150, md: 230 },
-                p: { xs: 3, md: 5 },
-                borderRadius: 2.5,
-                backgroundColor: "#1d4ed8",
-                color: "#fff",
-                textAlign: "center",
-                boxShadow: "0 14px 30px rgba(29, 78, 216, 0.16)",
+                position: "absolute",
+                inset: 0,
+                zIndex: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: { xs: "68% center", md: "center 58%" },
               }}
-            >
-              <Typography
-                component="h2"
-                variant="h4"
+            />
+            <Box
+              aria-hidden="true"
+              sx={{
+                position: "absolute",
+                inset: 0,
+                zIndex: 1,
+                pointerEvents: "none",
+                background: {
+                  xs: "linear-gradient(90deg, rgba(7,80,106,.96) 0%, rgba(7,80,106,.88) 48%, rgba(7,80,106,.5) 100%)",
+                  md: "linear-gradient(90deg, #07506a 0%, rgba(7,80,106,.96) 31%, rgba(7,80,106,.72) 48%, rgba(7,80,106,.08) 78%, rgba(7,80,106,0) 100%)",
+                },
+              }}
+            />
+            <Container maxWidth="xl" sx={{ py: { xs: 3, md: 4 } }}>
+              <Box
                 sx={{
-                  fontWeight: 800,
-                  fontSize: { xs: 25, sm: 30, md: 36 },
-                  lineHeight: 1.15,
-                  letterSpacing: "-0.02em",
+                  position: "relative",
+                  zIndex: 2,
+                  minHeight: { xs: 430, sm: 470, md: 480 },
+                  display: "grid",
+                  gridTemplateColumns: "1fr",
+                  alignItems: "center",
+                  gap: { xs: 1, md: 3 },
                 }}
               >
-                Shop By Category
-              </Typography>
-              <Typography sx={{ mt: 2, maxWidth: 320, color: "rgba(255,255,255,0.78)", fontSize: 14, lineHeight: 1.6 }}>
-                Browse our selected products by category.
-              </Typography>
-            </Box>
-
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", sm: "repeat(3, minmax(0, 1fr))" },
-                gap: { xs: 1.5, sm: 2 },
-                alignContent: "center",
-                minHeight: { xs: 150, md: 230 },
-                p: { xs: 3, md: 4 },
-                borderRadius: 2.5,
-                backgroundColor: "#f6d94c",
-                boxShadow: "0 14px 30px rgba(77, 61, 0, 0.12)",
-              }}
-            >
-              {categories.map((item) => (
-                <Button
-                  key={item}
-                  onClick={() => {
-                    setCategory(item);
-                    document.getElementById("catalog")?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                  variant="contained"
-                  sx={{
-                    minWidth: 0,
-                    width: "100%",
-                    px: { xs: 1, sm: 2 },
-                    py: 1.5,
-                    borderRadius: 2,
-                    backgroundColor: "#1f9c72",
-                    color: "#fff",
-                    boxShadow: "none",
-                    textTransform: "uppercase",
-                    textAlign: "center",
-                    fontSize: { xs: 10, sm: 11, md: 12 },
-                    fontWeight: 800,
-                    letterSpacing: { xs: "0.04em", md: "0.06em" },
-                    lineHeight: 1.25,
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    transition: "transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease",
-                    "&:hover": {
-                      backgroundColor: "#147a5a",
-                      transform: "translateY(-2px)",
-                      boxShadow: "0 8px 20px rgba(31, 156, 114, 0.24)",
-                    },
-                    "&:active": { transform: "translateY(0)" },
-                  }}
+                <Box sx={{ position: "relative", zIndex: 2, maxWidth: { xs: "100%", md: "54%" }, py: { xs: 1, md: 3 } }}>
+                  <Typography
+                    component="p"
+                    sx={{
+                      display: "inline-flex",
+                      px: 1.5,
+                      py: 0.65,
+                      mb: 1.5,
+                      borderRadius: 20,
+                      color: "#07506a",
+                      backgroundColor: "#f6d94c",
+                      fontSize: 11,
+                      fontWeight: 900,
+                      letterSpacing: "0.1em",
+                    }}
+                  >
+                    CLOUDFUND MARKETPLACE
+                  </Typography>
+                  <Typography
+                    component="h1"
+                    sx={{
+                      maxWidth: 560,
+                      fontSize: { xs: 38, sm: 50, md: 58 },
+                      lineHeight: 1.04,
+                      fontWeight: 850,
+                      letterSpacing: "-0.04em",
+                    }}
+                  >
+                    Great finds from shops near you.
+                  </Typography>
+                  <Typography sx={{ maxWidth: 470, mt: 1.75, color: "rgba(255,255,255,.88)", fontSize: { xs: 15, md: 17 }, lineHeight: 1.65 }}>
+                    Explore products from independent shops, compare your options, and order in one convenient marketplace.
+                  </Typography>
+                  <Stack direction="row" spacing={1.5} sx={{ mt: 3 }}>
+                    <Button
+                      component={Link}
+                      href="#catalog"
+                      variant="contained"
+                      sx={{ px: 2.6, py: 1.2, borderRadius: 20, backgroundColor: "#f6d94c", color: "#183640", fontWeight: 800, textTransform: "none", boxShadow: "none", "&:hover": { backgroundColor: "#ffe56a", boxShadow: "none" } }}
+                    >
+                      Shop products
+                    </Button>
+                    <Button
+                      component={Link}
+                      href="/vendor/register"
+                      sx={{ px: 2.2, py: 1.2, borderRadius: 20, border: "1px solid rgba(255,255,255,.55)", color: "#fff", textTransform: "none", "&:hover": { backgroundColor: "rgba(255,255,255,.1)" } }}
+                    >
+                      Sell on Cloudfund
+                    </Button>
+                  </Stack>
+                </Box>
+              </Box>
+            </Container>
+            <Stack direction="row" spacing={0.75} sx={{ position: "absolute", zIndex: 3, bottom: { xs: 12, md: 18 }, left: "50%", transform: "translateX(-50%)" }}>
+              {SLIDER_IMAGES.map((image, index) => (
+                <IconButton
+                  key={image}
+                  aria-label={`Show promotion image ${index + 1}`}
+                  onClick={() => setCurrentImgIdx(index)}
+                  size="small"
+                  sx={{ width: 20, height: 20, color: "#fff" }}
                 >
-                  {item === "All products" ? "All products" : item}
-                </Button>
+                  <Box sx={{ width: index === currentImgIdx ? 12 : 7, height: 7, borderRadius: 8, backgroundColor: index === currentImgIdx ? "#f6d94c" : "rgba(255,255,255,.7)" }} />
+                </IconButton>
               ))}
-            </Box>
+            </Stack>
           </Box>
+        ) : null}
 
-          <Box sx={{ display: { xs: "block", md: "none" }, mb: 2.5 }}>
-            <Box sx={{ position: "relative", overflow: "hidden", borderRadius: 2.5, minHeight: 150, background: "linear-gradient(135deg, #1f4a3e 0%, #2c6b5a 55%, #d9ef78 150%)", color: "#fff", p: { xs: 3, sm: 4 } }}>
-              <Box sx={{ position: "absolute", right: -20, top: -50, width: 170, height: 170, borderRadius: "50%", border: "28px solid rgba(217,239,120,.2)" }} />
-              <Typography variant="overline" sx={{ color: "#d9ef78", fontWeight: 800, letterSpacing: "0.1em" }}>Fresh finds</Typography>
-              <Typography component="h2" variant="h4" sx={{ position: "relative", maxWidth: 280, mt: 1, fontWeight: 700, lineHeight: 1.15 }}>Discover better prices, directly from trusted shops.</Typography>
-              <Typography variant="body2" sx={{ position: "relative", maxWidth: 290, color: "rgba(255,255,255,.78)", mt: 1.5 }}>Shop independent vendors and discover products selected for everyday living.</Typography>
-              <Button component={Link} href="/marketplace" variant="contained" sx={{ position: "relative", mt: 2.5, background: "#fff", color: "#203c35", borderRadius: 20, px: 3, py: 1, textTransform: "none", fontWeight: 700, boxShadow: "none" }}>
-                Shop now
-              </Button>
-            </Box>
-          </Box>
+          {!isFullCatalog ? (
+            <Container maxWidth="xl" sx={{ pt: { xs: 3, md: 4 }, pb: 1 }}>
+              <Box component="section" aria-labelledby="shop-categories-title">
+                <Stack direction="row" justifyContent="space-between" alignItems="end" sx={{ mb: 2 }}>
+                  <Box>
+                    <Typography component="h2" id="shop-categories-title" sx={{ color: "#192c36", fontSize: { xs: 21, md: 25 }, fontWeight: 800 }}>
+                      Shop by category
+                    </Typography>
+                    <Typography sx={{ mt: 0.4, color: "#687781", fontSize: 13 }}>
+                      Find something for every part of your day.
+                    </Typography>
+                  </Box>
+                  <Button component={Link} href="/marketplace" endIcon={<ArrowForwardIcon />} sx={{ color: "#087c91", fontWeight: 750, textTransform: "none", display: { xs: "none", sm: "inline-flex" } }}>
+                    View all
+                  </Button>
+                </Stack>
+                <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", sm: "repeat(3, minmax(0, 1fr))", md: "repeat(4, minmax(0, 1fr))", lg: "repeat(5, minmax(0, 1fr))" }, gap: { xs: 1, sm: 1.5 } }}>
+                  {homepageCategories.map((item, index) => {
+                    const categoryProducts = approvedProducts.filter((product) => product.category === item);
+                    const itemCount = categoryProducts.length;
+                    const categoryImage = CATEGORY_IMAGES[item] || categoryProducts.find((product) => product.image)?.image;
+                    return (
+                      <Button
+                        key={item}
+                        onClick={() => {
+                          setCategory(item);
+                          document.getElementById("catalog")?.scrollIntoView({ behavior: "smooth" });
+                        }}
+                        aria-label={`Browse ${item}, ${itemCount} ${itemCount === 1 ? "product" : "products"}`}
+                        sx={{
+                          minWidth: 0,
+                          minHeight: { xs: 76, md: 88 },
+                          display: "flex",
+                          justifyContent: "flex-start",
+                          gap: 1.25,
+                          px: { xs: 1.25, sm: 1.75 },
+                          py: 1.25,
+                          border: "1px solid #e5eaeb",
+                          borderRadius: 2,
+                          backgroundColor: "#fff",
+                          color: "#172d39",
+                          textAlign: "left",
+                          textTransform: "none",
+                          boxShadow: "0 3px 10px rgba(15,45,54,.035)",
+                          "&:hover": { backgroundColor: "#f5fbfc", borderColor: "#9bd3d6", boxShadow: "0 8px 18px rgba(15,45,54,.08)" },
+                        }}
+                      >
+                        <Box sx={{ width: 58, height: 58, flexShrink: 0, display: "grid", placeItems: "center", overflow: "hidden", borderRadius: 1.5, color: index % 2 ? "#087c91" : "#0b966e", backgroundColor: index % 2 ? "#e5f5f6" : "#e6f5ee", "& svg": { fontSize: 25 } }}>
+                          {categoryImage ? (
+                            <Box
+                              component="img"
+                              src={categoryImage}
+                              alt={`${item} product`}
+                              loading="lazy"
+                              sx={{ width: "100%", height: "100%", objectFit: "cover" }}
+                            />
+                          ) : getCategoryIcon(item)}
+                        </Box>
+                        <Box sx={{ minWidth: 0 }}>
+                          <Typography sx={{ color: "#233b47", fontSize: { xs: 12, sm: 13 }, fontWeight: 750, lineHeight: 1.25, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            {item}
+                          </Typography>
+                          <Typography sx={{ mt: 0.4, color: "#788991", fontSize: 11, fontWeight: 500 }}>
+                            {loading ? "Explore" : `${itemCount} ${itemCount === 1 ? "item" : "items"}`}
+                          </Typography>
+                        </Box>
+                      </Button>
+                    );
+                  })}
+                </Box>
+              </Box>
+            </Container>
+          ) : null}
 
           <Container maxWidth="xl" sx={{ pt: { xs: 0, md: 9 }, pb: 9 }}>
           <Box
@@ -479,7 +499,7 @@ export default function MarketplaceStorefront() {
                 {isFullCatalog ? "Cloudfund Marketplace" : "Discover independent shops"}
               </Typography>
               <Typography component="h2" sx={{ color: "#203c35", fontSize: { xs: 32, md: 42 }, lineHeight: 1.15, fontWeight: 600, mt: 0.5 }}>
-                {isFullCatalog ? "Browse products by brand." : "Find something worth keeping."}
+                {isFullCatalog ? "Browse products by category." : "Find something worth keeping."}
               </Typography>
             </Box>
             <Typography variant="body2" sx={{ maxWidth: 360, color: "#5e6a63", lineHeight: 1.7 }}>
@@ -504,7 +524,7 @@ export default function MarketplaceStorefront() {
             >
               <Box>
                 <Typography variant="h5" sx={{ color: "#203c35", fontWeight: 700, lineHeight: 1.2 }}>
-                  Products
+                  {isFullCatalog ? "Products" : "Explore the marketplace"}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
                   {loading ? "Finding products from our sellers…" : `${visibleProducts.length} approved products to explore`}
@@ -689,10 +709,10 @@ export default function MarketplaceStorefront() {
               aria-label="Product cards"
             >
               {productGroups.map((group) => (
-                <Box component="section" key={group.name || "featured-products"} aria-label={group.name || "Featured products"}>
+                  <Box component="section" key={group.name || "featured-products"} aria-label={group.name || "Featured products"}>
                   {group.name ? (
                     <Stack direction="row" justifyContent="space-between" alignItems="baseline" sx={{ mb: 2 }}>
-                      <Typography component="h3" sx={{ color: "#26343a", fontSize: { xs: 22, md: 28 }, fontWeight: 500 }}>
+                      <Typography component="h3" sx={{ color: "#192f3b", fontSize: { xs: 21, md: 25 }, fontWeight: 800, letterSpacing: "-0.02em" }}>
                         {group.name}
                       </Typography>
                       <Typography variant="body2" sx={{ color: "#687479" }}>
@@ -703,7 +723,7 @@ export default function MarketplaceStorefront() {
                   <Box
                     sx={{
                       display: "grid",
-                    gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", sm: "repeat(2, minmax(0, 1fr))", lg: "repeat(4, minmax(0, 1fr))" },
+                      gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", sm: "repeat(3, minmax(0, 1fr))", md: "repeat(4, minmax(0, 1fr))", xl: "repeat(5, minmax(0, 1fr))" },
                     gap: { xs: 1.5, md: 3 },
                   }}
                   >
@@ -720,22 +740,19 @@ export default function MarketplaceStorefront() {
                       background: "#fff",
                     }}
                   >
-                    <Box sx={{ position: "relative", overflow: "hidden", aspectRatio: "1 / 0.88" }}>
+                    <Box sx={{ position: "relative", overflow: "hidden", aspectRatio: "1 / 1", backgroundColor: "#f7f9f8" }}>
                       {product.image ? (
                         <Box
                           component="img"
                           src={product.image}
                           alt={product.name}
-                          sx={{ width: "100%", height: "100%", objectFit: "cover", background: "#edf0eb" }}
+                          sx={{ width: "100%", height: "100%", p: 1.25, objectFit: "contain", background: "#f7f9f8" }}
                         />
                       ) : (
                         <Box sx={{ width: "100%", height: "100%", background: "#edf0eb", display: "grid", placeItems: "center" }}>
                           <StorefrontOutlinedIcon sx={{ fontSize: 44, color: "#9ca99f" }} />
                         </Box>
                       )}
-                      <Box sx={{ position: "absolute", top: 1.25, left: 1.25, px: 1.25, py: 0.75, borderRadius: 1.5, backgroundColor: "rgba(32,60,53,.92)", color: "#fff", fontSize: 10, fontWeight: 800, textTransform: "uppercase" }}>
-                        {product.category || "Marketplace"}
-                      </Box>
                       <IconButton
                         aria-label={likedProducts.includes(product.id) ? `Unlike ${product.name}` : `Like ${product.name}`}
                         aria-pressed={likedProducts.includes(product.id)}
@@ -762,17 +779,14 @@ export default function MarketplaceStorefront() {
                     </Box>
                     <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1, flex: 1, p: { xs: 1.5, md: 2.25 } }}>
                       <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
-                        <Stack direction="row" alignItems="center" spacing={0.5} sx={{ color: "#e5a52e" }}>
-                          <StarRoundedIcon sx={{ fontSize: 14 }} />
-                          <Typography variant="caption" sx={{ color: "#687479", fontWeight: 700 }}>
-                            4.8
-                          </Typography>
-                        </Stack>
-                        <Typography variant="body1" sx={{ color: "#203c35", fontWeight: 800 }}>
+                        <Typography variant="caption" sx={{ color: "#087c91", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {product.category || "Shop find"}
+                        </Typography>
+                        <Typography variant="body1" sx={{ color: "#123d4b", fontWeight: 850, whiteSpace: "nowrap" }}>
                           {currency.format(product.price)}
                         </Typography>
                       </Stack>
-                      <Typography variant="h6" sx={{ color: "#202823", fontWeight: 700, lineHeight: 1.25, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                      <Typography variant="subtitle1" sx={{ color: "#23343d", fontWeight: 750, lineHeight: 1.25, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
                         {product.name}
                       </Typography>
                       <Typography variant="caption" sx={{ color: "#64736a", lineHeight: 1.35 }}>
