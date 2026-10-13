@@ -4,7 +4,7 @@ import { Inter } from "next/font/google";
 import Splashscreen from "../../components/custom/SplashScreen";
 import Wrapper from "../../components/header/Wrapper";
 import "./globals.css";
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 import NextTopLoader from "nextjs-toploader";
 export const metadata: Metadata = {
   title: "Cloudfund | Buy · Sell · Shop",
@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} ${inter.variable}`}>
         <AppRouterCacheProvider>
           <Splashscreen>
             <NextTopLoader
