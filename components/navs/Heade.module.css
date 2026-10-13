@@ -1,0 +1,56 @@
+.root {
+  display: flex;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 1200;
+  background: #fff;
+}
+
+.toolbar {
+  transition: 1s ease 0.5s;
+}
+.toolbar.scrolled {
+  transition: none;
+}
+
+.scrolled,
+.noScroll {
+  background: #fff !important;
+  box-shadow: 0 4px 18px #18231d12 !important;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  width: auto;
+  margin-right: auto;
+  text-decoration: none;
+}
+.brandLogo {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 42px;
+  object-fit: contain;
+}
+.nav {
+  display: flex;
+  margin: 0 auto;
+  align-self: stretch;
+  align-content: stretch;
+}
+
+.nav .item,
+.popperNav {
+  display: flex;
+  padding: 0 20px;
+  color: #7f7d7e;
+  align-items: center;
+}
+.active {
+  color: var(--primary) !important;
+  font-weight: 700;
+}
+

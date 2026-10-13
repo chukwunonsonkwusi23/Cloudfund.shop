@@ -1,0 +1,141 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+:root {
+  --primary: #203c35;
+  --secondary: #d9ef78;
+  --background: #f7f8f5;
+  --grey: #738078;
+  --color: #202823;
+
+  --max-container-width: 1200px;
+  --DataGrid-headersTotalHeight: 50px !important;
+}
+.innersection {
+  max-width: 1200px;
+  margin: auto;
+}
+@media (max-width: 600px) {
+  .innersection {
+    padding: 0 15px;
+  }
+}
+@media (max-width: 1200px) {
+  .innersection {
+    max-width: 900px;
+    margin: auto;
+  }
+}
+
+a {
+  color: var(--primary);
+  font-weight: 500;
+  text-decoration: none;
+}
+.shadow {
+  box-shadow: 0 5px 40px #0001;
+}
+.shadow-small {
+  box-shadow: 0 5px 15px #0001;
+}
+.border {
+  border: 1px solid #e4e7ec;
+}
+.raise-on-hover {
+  transition: 0.3s ease-in-out;
+}
+.raise-on-hover:hover {
+  transform: translateY(-15px);
+}
+
+.icon-bg {
+  background: #ffece5;
+  height: 70px;
+  width: 70px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+.flex-column {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section {
+  padding: 5vh 25px;
+}
+.header-text {
+  font-weight: 500 !important;
+  font-size: 36px !important;
+  line-height: 1.4 !important;
+  color: #000 !important;
+}
+
+.section-header-text {
+  font-weight: 500 !important;
+  font-size: 28px !important;
+  line-height: 1.4 !important;
+}
+
+.MuiDataGrid-cell,
+.MuiDataGrid-columnHeader {
+  padding: 0 20px !important;
+}
+.MuiDialog-paper {
+  border-radius: 15px !important;
+}
+
+@media (min-width: 720px) {
+  .section {
+    padding: 10vh 35px;
+    position: relative;
+  }
+
+  .header-text {
+    font-size: 56px !important;
+  }
+  .section-header-text {
+    font-size: 48px !important;
+  }
+}
+
+@media (min-width: 1360px) {
+  .header-text {
+    font-size: 72px !important;
+  }
+}
+@media (min-width: 1200px) {
+  .header-text {
+    font-size: 72px !important;
+  }
+}
+.section-inner {
+  max-width: 1200px;
+  margin: auto;
+}
+@media (max-width: 600px) {
+  .section-inner {
+    padding: 0 15px;
+  }
+}
+@media (min-width: 1200px) {
+  .section-inner {
+    max-width: 1200px;
+    margin: auto;
+  }
+}
