@@ -1,6 +1,21 @@
 "use client";
 
-import Script from "next/script";
+import { useEffect } from "react";
+
+type TawkApi = {
+  customStyle?: {
+    visibility: {
+      desktop: { position: "br"; xOffset: number; yOffset: number };
+      mobile: { position: "br"; xOffset: number; yOffset: number };
+    };
+  };
+};
+
+declare global {
+  interface Window {
+    Tawk_API?: TawkApi;
+  }
+}
 
 type TawkLiveChatProps = {
   propertyId: string;
@@ -8,20 +23,23 @@ type TawkLiveChatProps = {
 };
 
 export default function TawkLiveChat({ propertyId, widgetId }: TawkLiveChatProps) {
-  if (!propertyId || !widgetId) return null;
+  useEffect(() => {
+    if (!propertyId || !widgetId || document.getElementById("tawk-live-chat")) return;
 
-  return (
-    <>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `window.Tawk_API = window.Tawk_API || {}; window.Tawk_API.customStyle = { visibility: { desktop: { position: "br", xOffset: 24, yOffset: 24 }, mobile: { position: "br", xOffset: 16, yOffset: 122 } } };`,
-        }}
-      />
-      <Script
-        id="tawk-live-chat"
-        src={`https://embed.tawk.to/${encodeURIComponent(propertyId)}/${encodeURIComponent(widgetId)}`}
-        strategy="afterInteractive"
-      />
-    </>
-  );
+    window.Tawk_API = window.Tawk_API || {};
+    window.Tawk_API.customStyle = {
+      visibility: {
+        desktop: { position: "br", xOffset: 24, yOffset: 24 },
+        mobile: { position: "br", xOffset: 24, yOffset: 100 },
+      },
+    };
+
+    const script = document.createElement("script");
+    script.id = "tawk-live-chat";
+    script.src = `https://embed.tawk.to/${encodeURIComponent(propertyId)}/${encodeURIComponent(widgetId)}`;
+    script.async = true;
+    document.body.appendChild(script);
+  }, [propertyId, widgetId]);
+
+  return null;
 }
