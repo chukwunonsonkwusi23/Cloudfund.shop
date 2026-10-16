@@ -26,11 +26,13 @@ import {
   Card,
   CardContent,
   Container,
+  Badge,
   Drawer,
   FormControl,
   IconButton,
   MenuItem,
   Select,
+  Snackbar,
   Stack,
   TextField,
   Typography,
@@ -96,6 +98,7 @@ export default function MarketplaceStorefront() {
   const [cartLoaded, setCartLoaded] = useState(false);
   const [likedProducts, setLikedProducts] = useState<string[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [cartNotice, setCartNotice] = useState("");
   const [checkoutName, setCheckoutName] = useState("");
   const [checkoutEmail, setCheckoutEmail] = useState("");
   const [checkoutPhone, setCheckoutPhone] = useState("");
@@ -222,8 +225,6 @@ export default function MarketplaceStorefront() {
     (total, line) => total + line.product.price * line.quantity,
     0
   );
-  const shopCount = new Set(products.map((product) => product.vendorId)).size;
-
   const addToCart = (product: MarketProduct) => {
     setCart((current) => {
       const existing = current.find((line) => line.product.id === product.id);
@@ -235,6 +236,7 @@ export default function MarketplaceStorefront() {
           : line
       );
     });
+    setCartNotice(`${product.name} added to your bag`);
   };
 
   const changeQuantity = (productId: string, change: number) => {
@@ -484,7 +486,7 @@ export default function MarketplaceStorefront() {
             </Container>
           ) : null}
 
-          <Container maxWidth="xl" sx={{ pt: { xs: 0, md: 9 }, pb: 9 }}>
+          <Container maxWidth="xl" sx={{ pt: { xs: 0, md: 4 }, pb: { xs: 8, md: 5 } }}>
           <Box
             sx={{
               display: "grid",
@@ -502,11 +504,6 @@ export default function MarketplaceStorefront() {
                 {isFullCatalog ? "Browse products by category." : "Find something worth keeping."}
               </Typography>
             </Box>
-            <Typography variant="body2" sx={{ maxWidth: 360, color: "#5e6a63", lineHeight: 1.7 }}>
-              {isFullCatalog
-                ? `Browse all ${visibleProducts.length} matching products from ${shopCount} independent ${shopCount === 1 ? "shop" : "shops"}.`
-                : `Explore ${visibleProducts.length} approved finds from ${shopCount} independent ${shopCount === 1 ? "shop" : "shops"}.`}
-            </Typography>
           </Box>
 
           <Box id="catalog" sx={{ pt: 3 }}>
@@ -598,7 +595,7 @@ export default function MarketplaceStorefront() {
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 1,
+                  gap: { xs: 1, md: 2 },
                   mt: 1,
                   pb: { xs: 1, md: 0 },
                   overflowX: "auto",
@@ -614,10 +611,9 @@ export default function MarketplaceStorefront() {
                     onClick={() => setCategory(item)}
                     aria-pressed={category === item}
                     sx={{
-                      minWidth: { xs: "auto", md: 0 },
-                      px: { xs: 2, md: 0 },
+                      minWidth: "max-content",
+                      px: { xs: 1.5, md: 0.75 },
                       py: { xs: 1, md: 0 },
-                      p: 0,
                       color: category === item ? "#202823" : "#6b7280",
                       backgroundColor: category === item ? { xs: "#e9f2e8", md: "transparent" } : "transparent",
                       borderRadius: { xs: 2, md: 0 },
@@ -831,9 +827,9 @@ export default function MarketplaceStorefront() {
             right: { xs: 12, sm: 24 },
             bottom: { xs: 12, sm: 24 },
             zIndex: 1200,
-            width: { xs: 48, sm: 48 },
+            width: { xs: 48, sm: 48, md: 104 },
             height: { xs: 48, sm: 48 },
-            minWidth: 48,
+            minWidth: { xs: 48, sm: 48, md: 104 },
             minHeight: 48,
             display: { xs: "none", sm: "flex" },
             alignItems: "center",
@@ -847,7 +843,12 @@ export default function MarketplaceStorefront() {
             "&:hover": { backgroundColor: "#fff", boxShadow: "0 10px 32px #15251c24", transform: "translateY(-2px)" },
           }}
         >
-          <ShoppingBagOutlinedIcon sx={{ fontSize: 24 }} />
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Badge badgeContent={cartCount} color="error" overlap="circular" sx={{ "& .MuiBadge-badge": { fontWeight: 800, minWidth: 21, height: 21 } }}>
+              <ShoppingBagOutlinedIcon sx={{ fontSize: 26 }} />
+            </Badge>
+            <Box component="span" sx={{ display: { xs: "none", md: "inline" }, fontWeight: 750, fontSize: 13 }}>Bag</Box>
+          </Stack>
         </Button>
       </Box>
 
@@ -882,8 +883,8 @@ export default function MarketplaceStorefront() {
           <PersonOutlineIcon sx={{ fontSize: 22 }} />
           <Typography sx={{ fontSize: 10, fontWeight: 650 }}>Vendor</Typography>
         </Link>
-        <Button onClick={() => setCartOpen(true)} startIcon={<ShoppingBagOutlinedIcon sx={{ fontSize: 21 }} />} sx={{ color: "#738078", p: 0, minWidth: 0, textTransform: "none", "&:hover": { background: "transparent" } }}>
-          <Typography sx={{ fontSize: 10, fontWeight: 650 }}>Bag · {cartCount}</Typography>
+        <Button onClick={() => setCartOpen(true)} startIcon={<Badge badgeContent={cartCount} color="error" overlap="circular"><ShoppingBagOutlinedIcon sx={{ fontSize: 21 }} /></Badge>} sx={{ color: "#203c35", p: 0, minWidth: 0, textTransform: "none", "&:hover": { background: "transparent" } }}>
+          <Typography sx={{ fontSize: 10, fontWeight: 750 }}>Bag · {cartCount}</Typography>
         </Button>
       </Box>
 
@@ -953,6 +954,23 @@ export default function MarketplaceStorefront() {
           )}
         </Box>
       </Drawer>
+      <Snackbar
+        open={Boolean(cartNotice)}
+        autoHideDuration={5000}
+        onClose={() => setCartNotice("")}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        sx={{ bottom: { xs: "calc(80px + env(safe-area-inset-bottom)) !important", sm: "24px !important" } }}
+      >
+        <Alert
+          severity="success"
+          variant="filled"
+          onClose={() => setCartNotice("")}
+          action={<Button color="inherit" size="small" onClick={() => { setCartNotice(""); setCartOpen(true); }}>View bag</Button>}
+          sx={{ alignItems: "center", borderRadius: 3, boxShadow: "0 8px 28px rgba(15,45,35,.22)" }}
+        >
+          {cartNotice}
+        </Alert>
+      </Snackbar>
     </MainLayouts>
   );
 }

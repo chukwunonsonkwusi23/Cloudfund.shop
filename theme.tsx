@@ -4,9 +4,8 @@ import { createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
   typography: {
-    fontFamily:
-      "apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif",
-    fontWeightRegular: "lighter",
+    fontFamily: 'var(--font-inter), "Inter", Arial, sans-serif',
+    fontWeightRegular: 400,
   },
   components: {
     MuiDialog: {

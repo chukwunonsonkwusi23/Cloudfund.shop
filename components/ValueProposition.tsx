@@ -24,16 +24,13 @@ export default function ValueProposition() {
   return (
     <>
       <Box component="section" aria-labelledby="shopping-guide-title" sx={{ borderTop: "1px solid #e4e9e6", backgroundColor: "#fff" }}>
-        <Container maxWidth="xl" sx={{ py: { xs: 7, md: 10 } }}>
+        <Container maxWidth="xl" sx={{ py: { xs: 5, md: 7 } }}>
           <Box sx={{ maxWidth: 680, mb: 4 }}>
             <Typography component="p" variant="overline" sx={{ color: "#078b68", fontWeight: 700, letterSpacing: 1.5, mb: 1 }}>
               Shopping on Cloudfund
             </Typography>
             <Typography id="shopping-guide-title" component="h2" sx={{ color: "#26343a", fontSize: { xs: 32, md: 42 }, lineHeight: 1.15, fontWeight: 500, mb: 2 }}>
               A simpler way to shop independent.
-            </Typography>
-            <Typography sx={{ color: "#5e696d", fontSize: 16, lineHeight: 1.8 }}>
-              Find products from independent shops, place an order through Cloudfund, and check its progress online.
             </Typography>
           </Box>
 
@@ -56,7 +53,7 @@ export default function ValueProposition() {
       </Box>
 
       <Box component="section" sx={{ backgroundColor: "#f3f6f4", textAlign: "center" }}>
-        <Container maxWidth="md" sx={{ py: { xs: 6, md: 8 } }}>
+        <Container maxWidth="md" sx={{ py: { xs: 5, md: 6 } }}>
           <Typography component="h2" sx={{ color: "#26343a", fontSize: { xs: 30, md: 38 }, lineHeight: 1.2, fontWeight: 500, mb: 1.5 }}>
             Have a shop to share?
           </Typography>

@@ -106,7 +106,7 @@ export default function MarketplaceChatWidget() {
             position: "fixed",
             zIndex: 1400,
             right: { xs: 12, sm: 24 },
-            bottom: { xs: 84, sm: 96 },
+            bottom: { xs: 188, sm: 96 },
             width: { xs: "calc(100vw - 24px)", sm: 360 },
             height: { xs: "min(520px, calc(100dvh - 112px))", sm: 520 },
             maxHeight: "calc(100dvh - 100px)",
@@ -186,7 +186,7 @@ export default function MarketplaceChatWidget() {
         aria-label={open ? "Close chat" : "Open chat with Cloudfund"}
         aria-expanded={open}
         onClick={() => setOpen((current) => !current)}
-        sx={{ position: "fixed", zIndex: 1401, right: { xs: 16, sm: 24 }, bottom: { xs: 16, sm: 24 }, width: 58, height: 58, boxShadow: "0 8px 24px rgba(20,55,42,.28)" }}
+        sx={{ position: "fixed", zIndex: 1401, right: { xs: 16, sm: 24 }, bottom: { xs: 122, sm: 24 }, width: 58, height: 58, boxShadow: "0 8px 24px rgba(20,55,42,.28)" }}
       >
         {open ? <CloseIcon /> : <ChatBubbleOutlineIcon />}
       </Fab>
