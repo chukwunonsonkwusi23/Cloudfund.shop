@@ -487,24 +487,16 @@ export default function MarketplaceStorefront() {
           ) : null}
 
           <Container maxWidth="xl" sx={{ pt: { xs: 0, md: 4 }, pb: { xs: 8, md: 5 } }}>
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "1fr auto" },
-              gap: { xs: 2, md: 4 },
-              alignItems: "end",
-              pb: { xs: 3, md: 4 },
-            }}
-          >
-            <Box>
+          {isFullCatalog ? (
+            <Box sx={{ pb: { xs: 3, md: 4 } }}>
               <Typography variant="overline" sx={{ color: "#53665c", fontWeight: 700, letterSpacing: 1.4 }}>
-                {isFullCatalog ? "Cloudfund Marketplace" : "Discover independent shops"}
+                Cloudfund Marketplace
               </Typography>
               <Typography component="h2" sx={{ color: "#203c35", fontSize: { xs: 32, md: 42 }, lineHeight: 1.15, fontWeight: 600, mt: 0.5 }}>
-                {isFullCatalog ? "Browse products by category." : "Find something worth keeping."}
+                Browse products by category.
               </Typography>
             </Box>
-          </Box>
+          ) : null}
 
           <Box id="catalog" sx={{ pt: 3 }}>
             <Box
